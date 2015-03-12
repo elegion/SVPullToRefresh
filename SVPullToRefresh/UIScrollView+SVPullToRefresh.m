@@ -142,12 +142,13 @@ static char UIScrollViewPullToRefreshView;
         self.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
         self.textColor = [UIColor darkGrayColor];
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        self.state = SVPullToRefreshStateStopped;
+        self.state = SVPullToRefreshStateNone;
         self.showsDateLabel = NO;
         
         self.titles = [NSMutableArray arrayWithObjects:NSLocalizedString(@"Pull to refresh...",),
                                                        NSLocalizedString(@"Release to refresh...",),
                                                        NSLocalizedString(@"Loading...",),
+                                                       NSLocalizedString(@"Pull to refresh...",),
                                                        nil];
         
         self.subtitles = [NSMutableArray arrayWithObjects:@"", @"", @"", @"", nil];
@@ -218,6 +219,7 @@ static char UIScrollViewPullToRefreshView;
             self.subtitleLabel.text = subtitle;
         
         switch (self.state) {
+            case SVPullToRefreshStateNone:
             case SVPullToRefreshStateStopped:
                 self.arrow.alpha = 1;
                 [self.activityIndicatorView stopAnimating];
@@ -278,7 +280,7 @@ static char UIScrollViewPullToRefreshView;
             self.state = SVPullToRefreshStateLoading;
         else if(contentOffset.y < scrollOffsetThreshold && self.scrollView.isDragging && self.state == SVPullToRefreshStateStopped)
             self.state = SVPullToRefreshStateTriggered;
-        else if(contentOffset.y >= scrollOffsetThreshold && self.state != SVPullToRefreshStateStopped)
+        else if(contentOffset.y >= scrollOffsetThreshold && self.scrollView.isDragging && self.state != SVPullToRefreshStateStopped)
             self.state = SVPullToRefreshStateStopped;
     } else {
         CGFloat offset = MAX(self.scrollView.contentOffset.y * -1, 0.0f);
@@ -369,7 +371,7 @@ static char UIScrollViewPullToRefreshView;
         title = @"";
     
     if(state == SVPullToRefreshStateAll)
-        [self.titles replaceObjectsInRange:NSMakeRange(0, 3) withObjectsFromArray:@[title, title, title]];
+        [self.titles replaceObjectsInRange:NSMakeRange(0, 4) withObjectsFromArray:@[title, title, title, title]];
     else
         [self.titles replaceObjectAtIndex:state withObject:title];
     
@@ -381,7 +383,7 @@ static char UIScrollViewPullToRefreshView;
         subtitle = @"";
     
     if(state == SVPullToRefreshStateAll)
-        [self.subtitles replaceObjectsInRange:NSMakeRange(0, 3) withObjectsFromArray:@[subtitle, subtitle, subtitle]];
+        [self.subtitles replaceObjectsInRange:NSMakeRange(0, 4) withObjectsFromArray:@[subtitle, subtitle, subtitle]];
     else
         [self.subtitles replaceObjectAtIndex:state withObject:subtitle];
     
@@ -395,7 +397,7 @@ static char UIScrollViewPullToRefreshView;
         viewPlaceholder = @"";
     
     if(state == SVPullToRefreshStateAll)
-        [self.viewForState replaceObjectsInRange:NSMakeRange(0, 3) withObjectsFromArray:@[viewPlaceholder, viewPlaceholder, viewPlaceholder]];
+        [self.viewForState replaceObjectsInRange:NSMakeRange(0, 4) withObjectsFromArray:@[viewPlaceholder, viewPlaceholder, viewPlaceholder, viewPlaceholder]];
     else
         [self.viewForState replaceObjectAtIndex:state withObject:viewPlaceholder];
     
@@ -440,7 +442,7 @@ static char UIScrollViewPullToRefreshView;
 }
 
 - (void)stopAnimating {
-    self.state = SVPullToRefreshStateStopped;
+    self.state = SVPullToRefreshStateNone;
     
     if(!self.wasTriggeredByUser && self.scrollView.contentOffset.y < -self.originalTopInset)
         [self.scrollView setContentOffset:CGPointMake(self.scrollView.contentOffset.x, -self.originalTopInset) animated:YES];
@@ -461,6 +463,7 @@ static char UIScrollViewPullToRefreshView;
     [self setNeedsLayout];
     
     switch (newState) {
+        case SVPullToRefreshStateNone:
         case SVPullToRefreshStateStopped:
             [self resetScrollViewContentInset];
             break;

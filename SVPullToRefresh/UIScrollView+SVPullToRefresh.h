@@ -28,6 +28,7 @@ enum {
     SVPullToRefreshStateStopped = 0,
     SVPullToRefreshStateTriggered,
     SVPullToRefreshStateLoading,
+    SVPullToRefreshStateNone,
     SVPullToRefreshStateAll = 10
 };
 
