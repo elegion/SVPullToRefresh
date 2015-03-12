@@ -42,6 +42,7 @@ typedef NSUInteger SVPullToRefreshState;
 @property (nonatomic, readwrite) UIActivityIndicatorViewStyle activityIndicatorViewStyle;
 
 @property (nonatomic, readonly) SVPullToRefreshState state;
+@property (nonatomic, copy) BOOL (^stateChangeAction)(SVPullToRefreshState previousState, SVPullToRefreshState newState);
 
 - (void)setTitle:(NSString *)title forState:(SVPullToRefreshState)state;
 - (void)setSubtitle:(NSString *)subtitle forState:(SVPullToRefreshState)state;
